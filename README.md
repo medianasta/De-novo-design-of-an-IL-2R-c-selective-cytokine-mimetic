@@ -1,4 +1,4 @@
-# De-novo design of an IL-2R-c selective cytokine mimetic
+# *De novo* design of an IL-2R-c selective cytokine mimetic
 An open-source reimplementation of the design logic behind Neo-2/15 (Silva et al., Nature 2019): build a protein with a completely novel fold that presents interleukin-2's binding surface for the IL-2Rβ and γc receptors, while possessing no binding surface for the IL-2Rα receptor at all. 
 
 
