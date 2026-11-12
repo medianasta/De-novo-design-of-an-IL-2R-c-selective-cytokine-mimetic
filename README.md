@@ -2,7 +2,7 @@
 An open-source reimplementation of the design logic behind Neo-2/15 (Silva et al., Nature 2019): build a protein with a completely novel fold that presents interleukin-2's binding surface for the IL-2Rβ and γc receptors, while possessing no binding surface for the IL-2Rα receptor at all. 
 
 
-The pipeline has produced 2 candidates that survived filters. The more useful result is that roughly a third of the metrics conventionally used to evaluate such molecules failed against an explicit control, where several of them by scoring a randomly shuffled sequence, as well as or better than a validated molecule. The casualties include the metric I had pre-registered as primary, and the one metric that most flattered my own designs.
+The pipeline has produced a candidate that survived filters. The more useful result is that roughly a third of the metrics conventionally used to evaluate such molecules failed against an explicit control, where several of them by scoring a randomly shuffled sequence, as well as or better than a validated molecule. The casualties include the metric I had pre-registered as primary, and the one metric that most flattered my own designs.
 
 ### 1. The biological problem
 Interleukin-2 is a small signalling protein that tells T cells to multiply. It does this by binding to receptors on the cell surface, and it has **two different receptor assemblies it can bind**:
@@ -48,6 +48,11 @@ The premise holding, the motif was defined as three helical segments spanning 36
 | `3Dstructure` | freesasa, Biopython, py3Dmol | backbone-geometry QC, core packing and surface hydrophobicity, interface decomposition, the three pre-wetlab gates, structure figures | — |
 | `Master_Table_Candidate_Filters` | — | join everything, apply selection gates | 7 → **2** |
 
+The core trick in Stage 2 is called motif scaffolding: the chosen residues are held at their exact original coordinates while a generative model invents everything around them from noise. The result has a shape unrelated to IL-2 but presents the same binding surface.
+
+The validation in Stage 4: design a sequence for a shape, then predict that sequence's structure with a model that never saw the shape. If the prediction comes back to the intended shape, the sequence specifies it. ESMFold was chosen specifically, because it needs no evolutionary data: these molecules have no relatives, so any method relying on related sequences would be working outside its training range.
+
+<img width="2354" height="1320" alt="attrition_funnel" src="https://github.com/user-attachments/assets/0d0eccd9-1a95-430d-bc4d-1444e0669b6a" />
 
 
 
