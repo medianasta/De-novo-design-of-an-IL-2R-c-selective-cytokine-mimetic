@@ -1,0 +1,10 @@
+	n_self	n_rec	n_shared	pct_self_on_rec_face	self_iptm
+ctrl_IL2	70.0	28.0	14.0	20.0	0.8694
+ctrl_Neo	25.0	30.0	8.0	32.0	0.3359
+pad0_len100_37_fixContacts_2	23.0	31.0	13.0	56.5	0.3542
+pad0_len100_2_fixContacts_3	26.0	29.0	16.0	61.5	0.3466
+pad0_len100_2_fixContacts_0	31.0	30.0	14.0	45.2	0.5973
+pad0_len100_13_fixContacts_3	27.0	31.0	21.0	77.8	0.4445
+pad0_len100_15_fixAll_4	17.0	26.0	10.0	58.8	0.2066
+pad0_len100_22_fixAll_0	18.0	29.0	13.0	72.2	0.3093
+pad2_len100_7_fixAll_3	17.0	30.0	9.0	52.9	0.4257

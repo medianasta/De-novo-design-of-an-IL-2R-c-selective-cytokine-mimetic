@@ -1,0 +1,10 @@
+	n_res	total_sasa	exposed_nonpolar	pct_surface_nonpolar	n_exposed_hydroph	largest_patch_res	largest_patch_area	sap_max	sap_mean	patch_members
+native IL-2	120	7105	3991	56.2	15	2	180	0.96	0.31	19,23
+Neo-2/15	100	5836	3415	58.5	11	2	158	0.88	0.26	14,17
+pad0_len100_37_fixContacts_2	111	7348	3769	51.3	10	2	112	0.73	0.26	2,110
+pad0_len100_2_fixContacts_3	115	7756	4078	52.6	10	2	113	0.76	0.28	2,114
+pad0_len100_2_fixContacts_0	115	7951	4231	53.2	10	2	113	0.8	0.26	2,114
+pad0_len100_13_fixContacts_3	98	6363	3351	52.7	11	2	167	1.34	0.3	3,5
+pad0_len100_15_fixAll_4	105	7150	3800	53.1	9	2	174	1.06	0.27	8,12
+pad0_len100_22_fixAll_0	107	7239	3715	51.3	9	2	194	0.8	0.25	15,19
+pad2_len100_7_fixAll_3	91	5821	3295	56.6	9	2	98	0.94	0.32	36,38

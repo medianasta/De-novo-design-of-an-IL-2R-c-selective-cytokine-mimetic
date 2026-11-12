@@ -1,0 +1,4 @@
+molecule	dimer_fit	binder_pose	n_binder_res	beta_epi_boltz	beta_epi_af2	beta_overlap	gc_epi_boltz	gc_epi_af2	gc_overlap
+ctrl_IL2	1.5	1.72	133	16	17	65.0	13	15	64.7
+ctrl_Neo	1.96	2.32	104	20	19	77.3	16	15	82.4
+design_37	1.5	1.97	111	18	20	81.0	10	13	76.9

@@ -1,0 +1,10 @@
+design	n_polar	n_buried_polar	n_buns	buns_per_100res
+ctrl_IL2	380	191	3	2.256
+ctrl_Neo	304	162	0	0.0
+ctrl_scram	316	148	3	2.857
+pad0_len100_13_fixContacts_3	297	164	2	2.041
+pad0_len100_15_fixAll_4	316	167	2	1.905
+pad0_len100_22_fixAll_0	323	178	1	0.935
+pad0_len100_2_fixContacts_3	349	189	3	2.609
+pad0_len100_37_fixContacts_2	332	184	1	0.901
+pad2_len100_7_fixAll_3	256	139	0	0.0

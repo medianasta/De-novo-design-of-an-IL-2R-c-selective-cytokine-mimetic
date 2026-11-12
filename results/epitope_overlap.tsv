@@ -1,0 +1,11 @@
+design	n_bgc	n_alpha	n_shared	jaccard	pct_of_alpha_face
+ctrl_IL2	28	24	0	0.0	0.0
+ctrl_Neo	30	24	19	54.3	79.2
+ctrl_scram	34	23	21	58.3	91.3
+pad0_len100_13_fixContacts_3	31	30	21	52.5	70.0
+pad0_len100_15_fixAll_4	26	36	16	34.8	44.4
+pad0_len100_22_fixAll_0	29	35	21	48.8	60.0
+pad0_len100_2_fixContacts_0	30	31	16	35.6	51.6
+pad0_len100_2_fixContacts_3	29	23	17	48.6	73.9
+pad0_len100_37_fixContacts_2	31	32	19	43.2	59.4
+pad2_len100_7_fixAll_3	30	27	21	58.3	77.8

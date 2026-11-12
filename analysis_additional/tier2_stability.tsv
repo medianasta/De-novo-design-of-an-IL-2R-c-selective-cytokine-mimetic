@@ -1,0 +1,10 @@
+	n_res	n_buried_sc_polar	buns	buns_per_100res	buns_where	n_buried_res	pct_buried	pct_core_hydroph	pct_hydroph_buried	buns_at_3.2A
+native IL-2	120	6	2	1.67	HIS55:ND1;TRP121:NE1	33	27.5	90.9	53.6	2
+Neo-2/15	100	3	0	0.0		27	27.0	92.6	56.8	1
+pad0_len100_37_fixContacts_2	111	4	1	0.9	TYR12:OH	28	25.2	71.4	50.0	1
+pad0_len100_2_fixContacts_3	115	10	3	2.61	ARG22:NE;ARG22:NH1;ASN60:OD1	26	22.6	69.2	48.6	6
+pad0_len100_2_fixContacts_0	115	5	1	0.87	GLN11:OE1	24	20.9	70.8	43.6	3
+pad0_len100_13_fixContacts_3	98	7	1	1.02	GLN6:OE1	23	23.5	73.9	50.0	2
+pad0_len100_15_fixAll_4	105	8	3	2.86	GLN13:OE1;ASN54:OD1;ARG88:NE	25	23.8	84.0	52.5	4
+pad0_len100_22_fixAll_0	107	6	0	0.0		21	19.6	95.2	48.8	1
+pad2_len100_7_fixAll_3	91	4	0	0.0		27	29.7	77.8	53.8	1
