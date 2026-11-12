@@ -54,6 +54,94 @@ The validation in Stage 4: design a sequence for a shape, then predict that sequ
 
 <img width="2354" height="1320" alt="attrition_funnel" src="https://github.com/user-attachments/assets/0d0eccd9-1a95-430d-bc4d-1444e0669b6a" />
 
+### 3. Walkthrough the pipeline
+#### Stage 2: backbone generation
+152 backbones generated across four variants, crossing two amounts of padding around the motif with two length budgets.
+The motif transplanted perfectly. All 152 reproduced the frozen geometry to within 0.25 Å against a 1.0 Å threshold, so the filter never did any work, and that is reported as a null result rather than a 100% success rate. The second filter rejected reality, and catching that saved the stage. The filter asks whether the new shape intrudes into the space IL-2Rα occupies. I pre-registered 3.5 Å as the minimum clearance. No design passed and neither did native IL-2, which is co-crystallised with IL-2Rα and therefore guaranteed to fit alongside it. Native IL-2's closest approach is 2.70 Å.So the filter was measuring the wrong thing: at 3.5 Å it detects molecular contact, not physical overlap, and a protein that binds α obviously touches it. Recalibrating to the largest tested value the real complex passes gave 29 survivors from 152.
+
+Reviewing that control later found a second version of the same mistake. The threshold came from a native structure with all its side chains, but RFdiffusion outputs only the backbone and no side chains. Measuring native IL-2 on backbone atoms alone gives 3.02 Å, so the gate was too lenient by 0.32 Å, which costs 12 of the 29. Both numbers are reported, and everything downstream uses the 29. Distributional conclusions survive the recalibration. The two candidates that eventually pass every gate split on the stricter threshold: the lead candidate's backbone clears it at 3.25 Å, the co-leader's fails at 2.58 Å. That is a second criterion separating the two, measured on bare backbone geometry before any sequence existed, and it points the opposite way to the geometric criterion. Neither was used in the selection.
+
+A direction this filter may have had backwards. The filter removes designs whose scaffold occupies the volume IL-2Rα fills in the crystal. If a design engages βγc in IL-2's geometry, scaffold mass sitting in α's volume would sterically exclude α, which is the selectivity the project is trying to achieve, so filtering those designs out removes the one α-exclusion mechanism guaranteed to work. The argument the other way, and the one that motivated the filter, is that exclusion by occlusion is a property of superposing the design into the crystallographic frame and predicts nothing about whether α binds the designed surface in isolation. The ambiguity is recorded rather than resolved. In practice the filter acted mainly as a length filter.
+
+A second asymmetry: clearance was measured against IL-2Rα only. Nothing at this stage tested, whether the scaffold also grows into IL-2Rβ or γc: the chains it must bind, because RFdiffusion was run on the motif alone with no target chain present. That is tested implicitly at Stage 5, where the designs clearing the target-engagement gate bury 614–688 Å² against IL-2Rβ and 422–475 Å² against γc, so the target volume is not occluded in the candidates carried forward. Generating with βγc present as a fixed target chain is the correct construction and is the main structural change for a second pass.
+
+Size, not padding, predicts clearance. Pass rate falls from 71% below 95 residues to 4% above 115 (p < 0.001); padding has no detectable effect (p = 1.00 and p = 0.58). Surviving designs average 102 residues; Neo-2/15 is about 100.
+
+#### Stage 3: amino acid decoration of generated backbones
+Two variants were run on every shape: freeze all 36 transplanted positions, or freeze only the 21 that actually touch a receptor and let the rest be redesigned. 
+
+Freezing less was better. Better sequence-structure agreement (1.196 vs 1.291, lower is better) and it solved a problem the pipeline had created.
+I had instructed the model never to use cysteine because the case is found in the extracellular space. In the "freeze only contacts" arm: zero cysteines. In the "freeze everything" arm: all 145 sequences had one. The exclusion only applies to positions the model is choosing; frozen positions keep whatever was transplanted. IL-2 has a lone cysteine at position 125, it sits inside one of the frozen segments, and it was simply carried along, despite burying no receptor surface at all.
+
+Released, the model replaced it with leucine in 108 of 145 cases and something hydrophobic in 98%. I checked the position independently: it is in the 98th percentile of local packing density with zero solvent exposure: a buried core position, where hydrophobic is correct. The clinically used form of IL-2, aldesleukin, also removes that cysteine. Instead, it uses serine, which is a manufacturing compromise rather than a good core residue.
+
+The two arms are not a clean one-variable comparison for this reason: they differ in the number of frozen positions and in the presence of a free cysteine, and the Stage 4 results below cannot separate the two effects.
+
+A control: A score of 1.196 is uninterpretable alone, so I ran the identical procedure on native IL-2 and Neo-2/15, and then, the important part, froze the same positions on native IL-2 itself.
+
+| | score (lower is better) |
+|---|---|
+| Neo-2/15, nothing frozen | 0.896 |
+| native IL-2, 21 frozen | 1.031 |
+| native IL-2, 36 frozen | 1.053 |
+| native IL-2, nothing frozen | 1.069 |
+| **my shapes, nothing frozen** | **1.078** |
+| my shapes, 21 frozen | 1.196 |
+| my shapes, 36 frozen | 1.291 |
+
+The cost of the transplant changes sign between the two scaffolds: freezing those positions on native IL-2 slightly improves its score, while freezing the same positions on a novel shape makes it substantially worse. Without the native control, an elevated score could have meant either bad shapes or an expensive transplant, with no way to tell them apart.
+
+What the 0.009 gap does and does not say. My generated shapes score within 0.009 of native IL-2 when redesigned unconstrained, but this is ProteinMPNN scoring agreement under its own model, and Stage 4 shows that score carries no within-arm information about whether a sequence folds (correlations of −0.17 and −0.02, null χ² tests). So the correct reading is narrow: the backbones are as easy for an inverse-folding model to encode as a real cytokine. It is not evidence that they fold, and not a claim that scaffold quality is unlimiting.
+
+#### Stage 4: do sequences fold?
+115 of 290 sequences fold back into their intended shape, from 20 of 29 backbones. This is the first evidence that the sequences specify their intended fold under an independent predictor. It is not evidence that they fold in reality: ProteinMPNN and ESMFold are both trained on the PDB and both favour idealised helical geometry, so self-consistency here is necessary and not sufficient.
+
+The two arms fail differently, not at different rates. Pass rates of 65 vs 50 out of 145 (p = 0.093, not significant). But catastrophic failures, where the prediction comes back unrelated to the target shape, are 4 versus 20 (odds ratio 5.6, p < 0.001). Median agreement differs by 0.07 Å between arms and conceals this entirely. The informative part of a distribution running from 0.4 Å to 15.5 Å is the tail.
+
+Two qualifications on that comparison. The arms differ in the free-cysteine covariate as well as in the number of frozen positions, so it does not isolate the mechanism. And the 290 sequences are 29 backbones × 5 sequences × 2 arms: clustered, and paired across arms, so a test treating them as independent reports an optimistic p-value.
+The three-filter funnel turned out to be one filter. Of 118 designs clearing the confidence threshold, 115 clear everything. The other two filters remove three designs between them. One gate does 97% of the work, which is not what was expected when three were specified.
+
+#### Candidate independence: are those 12 designs?
+No. It is one fold, sampled twelve times.
+
+TM-score measures structural similarity; above 0.5 means the same fold. All 66 pairs of candidates exceed it, and the median is 0.892 — near-identical structure, not merely the same topology. At the sequence level the median pairwise identity is 53.6% (range 42.9–69.5%), of which roughly 21 points is the frozen motif itself. No clustering was performed, so the number of distinct sequence groups is not quantified.
+
+Running this before the complex predictions is what stopped twelve near-copies being reported as twelve independent designs, and saved GPU time predicting duplicates. It also bounds every later claim: this project describes one topology, not a survey of solutions. The diversity selection that followed confirms it: picking the six most dissimilar candidates lowered maximum pairwise TM from 0.979 to 0.921 and left the median unchanged (0.891 against 0.892).
+
+One incidental finding: the designs are structurally closer to Neo-2/15 (0.686) than Neo-2/15 is to IL-2 (0.602), despite never having been compared to Neo-2/15 during design. Two explanations are available and this project does not separate them. The first is shared idealisation: generative models and Rosetta both produce regular, idealised helical bundles, while evolved proteins are irregular. The second is connectivity: my designs run H1 → H3 → H4 with the intervening helix absent, and Neo-2/15's published topology is H1-H3-H2'-H4, so both place the three binding helices in an order native IL-2 does not. The second explanation is the more parsimonious one and was not tested.
+
+#### Stage 5: Predicting the complexes
+Each candidate predicted twice: once with IL-2Rβ and γc, once with IL-2Rα. Three controls run identically: native IL-2, Neo-2/15, and a randomly shuffled version of one of my own designs, a sequence that cannot fold into anything. This is where the pre-registered primary metric died. The replacement metric: interface error decomposed per chain pair - separates the controls correctly, and five of six designs are predicted to engage the target receptors more confidently than Neo-2/15. The results explain why that should be read with suspicion rather than satisfaction, and records that the floor this gate stands on is weaker than it looks.
+
+An internal check worth noting: IL-2Rβ and γc touch each other in every prediction whatever is bound to them, so their mutual interface error should be constant. It is: 7.98 ± 0.51 across nine predictions, confirming the decomposition measures what it claims to.
+
+#### Interfaces, replication, developability
+A single-residue fix, found by comparing siblings. One candidate had three buried polar atoms with no hydrogen-bonding partner which is a packing defect. Comparing the five sequences ProteinMPNN produced for that same shape showed they differ at position 22: three have tyrosine, one leucine, one arginine. The arginine variant was my candidate, and its arginine was the defect. Taking the tyrosine sibling instead reduced the count from three to one on the ESMFold models (three to two when measured on the predicted complexes: the two structure sources do not agree exactly, and both are reported). Same geometry, one residue different: a controlled comparison.
+
+Replication showed the α counter-screen is worse than noisy. Repeating the α prediction across four random seeds: confidence varied enormously (one design ranged 0.24 to 0.77 — wider than the entire gap between the positive and negative controls). But the geometric measurement is more damning. Buried interface area ranged from 769 to 1202 Å², and the identity of the contacting residues overlapped by only 42% between seeds. Two predictions of the same complex share fewer than half their interface residues. The model is not uncertain about how good the interface is and it is building a different interface each time.
+
+The self-sticking screen fails its own control. Each sequence was predicted against a copy of itself, since a protein that prefers its own surface to the receptor's is unusable. Native IL-2, which is a monomer in solution, scores as the most strongly self-associating molecule in the panel (0.869), a false positive on the one molecule whose answer is known. The likely cause is an MSA asymmetry: native IL-2 was the only ligand given a server alignment, and alignment-driven prediction of cytokine homodimers is a known failure mode. Neo-2/15, predicted the same way as the designs, gives the correct answer (0.336) and is used as the reference instead. The threshold derived that way is the only one in the project not anchored on a control, and is labelled post-hoc wherever it appears.
+
+Interface composition, including the control. Designs bury 495–688 Å² against IL-2Rβ and 422–475 Å² against γc, against native IL-2's 665 and 455 and Neo-2/15's 742 and 489. The shuffled control buries 773 Å² against IL-2Rβ, more than every design and more than native IL-2, at a comparable nonpolar fraction of 0.600. A sequence that cannot fold is given the largest β interface in the panel, which is a fifth metric failing its negative control and the clearest single indication that buried area carries no binding information here. Nonpolar fraction at that interface is 0.59–0.61 for designs, 0.58 for native IL-2 and 0.56 for Neo-2/15, so the designed interfaces are marginally greasier than either reference, which is the idealisation pattern again.
+
+Developability does not discriminate. Native IL-2 carries three lone cysteines and three unsatisfied buried polar atoms. Neo-2/15's computed instability index is worse than five of seven designs. Both molecules work. These metrics describe whether something can be manufactured, not whether it functions, and are reported without gating.
+
+#### Cross-check
+Boltz-2 and AlphaFold2-multimer are built differently with different internal architectures, different handling of evolutionary data, different training vintages — so they can fail differently. Three complexes were re-predicted with AlphaFold. Both models rank the lead candidate above both references on target-interface confidence, and under AlphaFold the lead candidate reproduces the native receptor arrangement more closely than Neo-2/15 does: 1.04 Å against 1.77 Å, where AlphaFold disagrees with itself about native IL-2 by 0.73 Å.
+
+The first of those is not independent corroboration. Native IL-2 < Neo-2/15 < my design is exactly the idealisation ordering documented in §4, so two tools agreeing is at least as consistent with a bias they share as with better target engagement. It is reported as an observation.
+
+The second does not survive the cross-check either, and that is the point of running one. The same measurement under Boltz-2 inverts the ordering — Neo-2/15 1.50 Å, design 37 2.07 Å — against a gate pre-registered at 2.0 Å, which the lead candidate therefore fails and the co-leader (1.48 Å) passes. The AlphaFold values are five non-independent networks, the Boltz value is a single seed. Neither carries an error model that resolves the disagreement, so the geometry claim is tool-dependent rather than established, and it is not carried into the selection in Results.
+
+This is a partial check in two further ways: both models train on the same database of experimental structures and share blind spots wherever those are scarce: de novo complexes being exactly such a gap and they disagree with each other by 1.5–2.0 Å about a receptor pair both have almost certainly seen in training, which is notable rather than reassuring.
+
+
+
+
+
+
+
+
 
 
 
