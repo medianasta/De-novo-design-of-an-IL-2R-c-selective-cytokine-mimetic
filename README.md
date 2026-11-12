@@ -135,6 +135,60 @@ The second does not survive the cross-check either, and that is the point of run
 
 This is a partial check in two further ways: both models train on the same database of experimental structures and share blind spots wherever those are scarce: de novo complexes being exactly such a gap and they disagree with each other by 1.5–2.0 Å about a receptor pair both have almost certainly seen in training, which is notable rather than reassuring.
 
+#### Alignment nulls: is the resemblance to Neo-2/15 meaningful?
+Aligning the designs against Neo-2/15 with the transplanted motif masked out — so only freely designed positions are compared — and against two unrelated human helical proteins as controls:
+
+| reference | observed identity | shuffled null | z |
+|---|---|---|---|
+| Neo-2/15 | 18.3% | 9.7 ± 3.8% | +2.2 |
+| saposin C | 14.9% | 8.3 ± 4.4% | +1.5 |
+| apolipoprotein E, N-terminal domain | 19.8% | 9.1 ± 3.3% | **+3.2** |
+
+The designs score no closer to the molecule they were modelled on than to an unrelated human helical bundle. Whatever similarity exists is generic helical-bundle character, not functional convergence. (The three z-scores are not separable from one another at n = 6 with overlapping nulls; the claim is the absence of a Neo-2/15-specific signal, not a ranking.)
+
+### 4. The metric problem 
+
+Twelve metrics were discarded, including the one pre-registered as primary. Ten of them failed against an explicit control, never because they gave an inconvenient answer about a design. The remaining two: pDockQ and ipSAE, are reported as untested rather than failed: ColabFold emits them as direction-dependent per-chain-pair values and they were never reduced to comparable scalars, so no control was run on them.
+
+#### How controls were designed
+Every selectivity metric was evaluated against three reference molecules at once:
+1. Native IL-2 — positive control. It binds both receptor assemblies, so a valid selectivity metric must score it as non-selective.
+2. Neo-2/15 — the reference for what a genuinely selective molecule looks like.
+3. A composition-matched shuffled sequence — the floor. If a metric cannot separate a real protein from its own amino acids in random order, it cannot rank designs.
+
+Plus an internal invariant (a quantity that should not change between conditions, as a check on the measurement itself), seed replication to measure randomness within one model, and a second architecture to measure bias across models.
+
+#### What controls caught 
+The pre-registered primary metric. ipTM is a standard confidence score for predicted complexes. My metric was its difference between the two panels — high confidence on the target, low on the counter-target, should mean a selective molecule.
+
+| | confidence, βγc | confidence, α | **difference** |
+|---|---|---|---|
+| native IL-2 | 0.908 | 0.884 | 0.024 |
+| Neo-2/15 | 0.891 | 0.761 | 0.130 |
+| **shuffled sequence** | **0.870** | 0.706 | **0.164** |
+
+A sequence that cannot fold is predicted against the receptor assembly at 0.870, against real IL-2's 0.908, and scores as more selective than the validated reference drug candidate. The metric reads the positive control correctly and fails on the negative one. Discarded.
+
+The replacement metric's difference form fails the same way. Interface error gave Neo-2/15 7.66 and shuffled 7.57 are indistinguishable. Only the raw value on the target interface worked (IL-2 6.69, Neo-2/15 6.65, shuffled 8.97). A selectivity metric built as the difference between two confidence scores inherits the uninformativeness of both, because both are high for almost any two chains a model can pack together.
+
+Buried surface area, same failure. The shuffled control buries 773 Å² against IL-2Rβ against native IL-2's 665 (§3). Interface size does not separate a protein from a sequence that cannot fold, so it is reported descriptively and gates nothing.
+
+Confirmed independently in a second architecture. IL-2Rβ and γc touch each other in every complex, whatever is bound. Across 15 AlphaFold predictions spanning three unrelated molecules, the confidence for that receptor pair is 0.8601 ± 0.0052: a variation of 0.6%. The score is blind to what is bound to it. This is the most robust number in the project and it is a negative result about a metric.
+
+Most of the published confidence panel cannot discriminate at all. Of five such metrics tested, one accounts for 90% of the between-molecule variance and four do not. One of them, actifptm, returns 0.981, 0.980 and 0.980 for a natural cytokine, a clinical-stage design and an untested design.
+
+**A sequence-only metric cannot beat shuffled sequence.** ESM-2 pseudo-log-likelihood scores how "natural" a sequence looks. Against a shuffled floor of −2.68 ± 0.13: Neo-2/15 scores −2.76, below the mean, and its structure is gap-free so the score is clean. Native human IL-2 scores −2.83 from the crystal sequence and −2.57 from the full UniProt entry — the crystal sequence has unresolved loops spliced out, which depresses the score, so the splicing artefact explains part of the deficit but not the result. (The UniProt entry is the 153-residue precursor including its signal peptide, so that value is an upper bound rather than a like-for-like comparison.) At best IL-2 sits 0.9 SD above a floor made of shuffled sequence. My untested designs score −2.07 to −2.24, three to five standard deviations above it. The mechanism is visible in the references: the large, well-studied receptor chains score well (γc −1.50) while IL-2, a short cytokine with few close relatives, scores badly. The metric measures how typical a sequence is of its training data, not whether it folds. Designed sequences are more generic than real ones, so it rewards them.
+
+Two caveats on that comparison, in the same spirit as the rest of this section: the shuffled floor is composition-matched to my designs and not to IL-2 or Neo-2/15, and the reference values for the receptor chains are full-length entries including transmembrane and cytoplasmic regions. Both weaken the quantitative anchors without changing the direction.
+
+
+
+
+
+
+
+
+
 
 
 
