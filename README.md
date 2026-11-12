@@ -115,6 +115,8 @@ Each candidate predicted twice: once with IL-2Rβ and γc, once with IL-2Rα. Th
 
 An internal check worth noting: IL-2Rβ and γc touch each other in every prediction whatever is bound to them, so their mutual interface error should be constant. It is: 7.98 ± 0.51 across nine predictions, confirming the decomposition measures what it claims to.
 
+<img width="2191" height="1646" alt="selectivity_2d_round2" src="https://github.com/user-attachments/assets/c91853c4-b4b9-4344-9b93-cf24c8ad4167" />
+
 #### Interfaces, replication, developability
 A single-residue fix, found by comparing siblings. One candidate had three buried polar atoms with no hydrogen-bonding partner which is a packing defect. Comparing the five sequences ProteinMPNN produced for that same shape showed they differ at position 22: three have tyrosine, one leucine, one arginine. The arginine variant was my candidate, and its arginine was the defect. Taking the tyrosine sibling instead reduced the count from three to one on the ESMFold models (three to two when measured on the predicted complexes: the two structure sources do not agree exactly, and both are reported). Same geometry, one residue different: a controlled comparison.
 
@@ -145,6 +147,9 @@ Aligning the designs against Neo-2/15 with the transplanted motif masked out —
 | apolipoprotein E, N-terminal domain | 19.8% | 9.1 ± 3.3% | **+3.2** |
 
 The designs score no closer to the molecule they were modelled on than to an unrelated human helical bundle. Whatever similarity exists is generic helical-bundle character, not functional convergence. (The three z-scores are not separable from one another at n = 6 with overlapping nulls; the claim is the absence of a Neo-2/15-specific signal, not a ranking.)
+
+<img width="3107" height="1664" alt="alignment_properties" src="https://github.com/user-attachments/assets/76d33152-6618-4cab-82d1-a1074dfb750e" />
+
 
 ### 4. The metric problem 
 
