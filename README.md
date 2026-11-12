@@ -181,24 +181,130 @@ Most of the published confidence panel cannot discriminate at all. Of five such 
 
 Two caveats on that comparison, in the same spirit as the rest of this section: the shuffled floor is composition-matched to my designs and not to IL-2 or Neo-2/15, and the reference values for the receptor chains are full-length entries including transmembrane and cytoplasmic regions. Both weaken the quantitative anchors without changing the direction.
 
+A correlation that looked like validation was circular. That same metric does correlate with ESMFold's confidence (Spearman +0.45, p = 10⁻¹⁵). But ESMFold is built on ESM-2: its sequence encoder is an ESM-2 model. Two metrics from the same model family agreeing is not a cross-check. This is why the AlphaFold comparison was worth doing: to get an independent check you have to leave the family.
 
+A geometric filter rejected the crystal structure. Covered in §3: the pre-registered α clearance threshold excluded the real IL-2/IL-2Rα complex.
 
+A measurement whose answer changes between runs. Covered in §3: the α interface moves between seeds, with 42% residue overlap.
 
+A screen that fails on a known monomer. Covered in §3: native IL-2 scores as the strongest self-associator in the panel.
 
+The same inversion appeared on unrelated metrics from different model families:
+| metric | ordering |
+|---|---|
+| ProteinMPNN sequence-structure agreement | Neo-2/15 better than native IL-2 |
+| ESMFold confidence (pLDDT) | IL-2 < Neo-2/15 < designs |
+| Boltz-2 interface error | designs better than Neo-2/15 and IL-2 |
+| AlphaFold target-interface confidence | IL-2 < Neo-2/15 < my design |
 
+Native protein worst, published de novo design in the middle, my untested design best — every time. That is the order of increasing structural idealisation, not of demonstrated function. Generative models produce regular, textbook-perfect geometry, evolved proteins are irregular, and prediction models are more confident about the regular ones.
 
+Every confidence-based result in this project therefore carries a bias in the direction that flatters the designs, including the favourable ones. And the inference follows: when a metric ranks an untested design above a clinical-stage molecule, the correct conclusion is that the metric is invalid for that comparison, not that the design is better.
 
+### 5. What the candidates are, and are not
+Two designs pass all three selection gates: pad0_len100_37_fixContacts_2 and pad0_len100_2_fixContacts_3. No single winner is defensible, which is consistent with the ranking having changed at every one of five evaluation layers.
 
+<img width="3453" height="1317" alt="candidate_comparison" src="https://github.com/user-attachments/assets/36a560cb-0edc-4d40-9e2c-0653d53c6ea3" />
 
+The three gates are not of equal standing:
 
+1. Target engagement must beat the shuffled sequence. Anchored on a control, but on a control that does not fold, so it is a protein-ness floor rather than a binding floor.
+2. α rejection must beat Neo-2/15's values across at least three of four seeds. Anchored on a control, but applied to a measurement §3 shows is not reproducible between runs, and against a Neo-2/15 reference value that is itself single-seed while the designs are judged on four-seed distributions. This is triage, not evidence of the same quality as the first gate.
+3. Self-association is post-hoc, for the reason given in §3, and labelled as such everywhere.
 
+Two further criteria exist, were computed, and are not in the gate count, because they point in opposite directions. The corrected backbone-only α clearance from Stage 2 favours 37_fixContacts_2 (3.25 Å against the co-leader's 2.58 Å, measured before any sequence existed). The pre-registered receptor-orientation gate from the pre-wetlab checks favours 2_fixContacts_3 (1.48 Å against 2.07 Å, against a 2.0 Å threshold the lead therefore fails), and that measurement is single-seed and inverted by the other predictor (§3). Each is a single unreplicated number, they disagree, and neither is strong enough to break the tie. They are reported here rather than used, and they are the clearest statement of why the tie should not be broken on this evidence.
 
+On the ungated developability measures, 37_fixContacts_2 is the stronger of the two: one unsatisfied buried polar atom against three, the lowest computed instability index in the panel including both references, no lone cysteine, and a net charge well away from the value at which proteins aggregate. That is why it is treated as the lead candidate. It is a weaker basis than a gate for two reasons: no control-anchored threshold exists for any developability metric, and the unsatisfied-polar counts are computed on predicted side-chain positions at a 3.5 Å cutoff: single-digit integers that shift by up to three when the cutoff moves to 3.2 Å.
 
+#### What they are
+A 111-residue protein of novel fold, carrying IL-2's β/γc motif across two measured hops: the generated backbone reproduces the native motif geometry to within 0.25 Å, and the independent structure prediction reproduces that backbone's motif to 0.48 Å, which folds into its intended shape under a predictor that never saw the backbone, and which two architecturally distinct models place confidently against the target receptors. The end-to-end motif RMSD against the crystal structure was not computed, the two hops are reported separately rather than composed.
 
+Two measurements made on the receptor side rather than the design side support the same reading. The lead candidate buries 87.5% of the IL-2Rβ residues and 76.9% of the γc residues that native IL-2 buries in the equivalent prediction (Neo-2/15: 93.8% and 100%), so it engages the receptors at the epitope IL-2 uses rather than somewhere else on the same chains. And its bound conformation differs from its free one by 0.53 Å, against a field convention of 1.5 Å, so it does not have to rearrange to bind. Both are computed against a predicted native complex rather than the crystal, and both are single-seed.
 
+#### What they are not: better than Neo-2/15
+The metrics favouring them are confidence scores subject to the bias in §4, and the ordering that favours them is that bias's signature. Under AlphaFold my candidate deviates less from the native receptor geometry than Neo-2/15 does, under Boltz-2 the reverse. Either way Neo-2/15 controls tumours in mice, so geometric fidelity demonstrably is not what predicts efficacy. Neo-2/15 has experimental data and these have none.
 
+#### What they are not: selective
+Five of six designs contact IL-2Rα more than native IL-2 does, and the lead candidate contacts it most in the panel: 46 contacts against Neo-2/15's 14.
 
+Why that is not conclusive is itself a result. Comparing each molecule's β/γc-contacting residues against its α-contacting residues:
 
+| | shared residues | overlap (Jaccard) | % of α surface shared with βγc surface |
+|---|---|---|---|
+| native IL-2 | **0** | **0%** | **0%** |
+| Neo-2/15 | 19 | 54.3% | 79.2% |
+| shuffled sequence | 21 | 58.3% | 91.3% |
+| designs (n = 7) | 16–21 | 34.8–58.3% | 44.4–77.8% |
 
+Native IL-2's two receptor surfaces are entirely separate: zero shared residues, independently reproducing the Stage 1 premise from two separate predicted complexes rather than from the crystal. Every de novo molecule has essentially one interface-like surface instead, including Neo-2/15, which has the property more strongly than six of my seven designs and is nonetheless experimentally selective.
 
+Three conclusions. This is a further metric that fails its negative control: it cannot separate a validated selective molecule (54.3%) from a sequence that cannot fold (58.3%). The α counter-screen is answering the wrong question: for native IL-2, "does it bind α" concerns a spatially distinct site; for a de novo mimetic, α and the target receptors compete for the same surface. And the reason is structural rather than incidental: the separability the design objective assumes is a property of IL-2's 133-residue irregular fold, and a ~100-residue idealised bundle does not have the surface to keep two epitopes apart. Grafting β/γc contacts while excluding α contacts cannot deliver α-selectivity by construction at this scaffold size. Selectivity there is an affinity competition on one surface, which no confidence score can evaluate. It requires a measured binding constant.
 
+Two further notes. The design with the lowest overlap has the worst target engagement in the panel, worse than the shuffled control, so low overlap tracks prediction quality rather than selectivity. And that same design (15_fixAll_4) is the one piece of evidence that the target-engagement gate is not purely a foldedness detector: it clears self-consistency at pLDDT 92.5 and scRMSD 0.62, so it folds, and still scores 11.10 against the shuffled control's 8.97. That is n = 1 and not a substitute for the control described in §6.
+
+#### What they are not: characterised energetically
+Every metric here is a predictive confidence or a buried surface area. None is a binding free energy. No affinity, no selectivity ratio, no melting temperature.
+
+#### What this project establishes, suggests, and cannot address
+| | |
+|---|---|
+| **Establishes** | The geometric premise holds for native IL-2. The pipeline runs end to end and produces self-consistent molecules of novel fold. Ten conventional evaluation metrics, including the pre-registered primary, fail against controls that are shown. Confidence metrics are systematically biased toward idealised geometry. The α counter-screen is ill-posed for de novo molecules. |
+| **Suggests** | Scaffold length constrains α clearance. Freezing only measured contacts outperforms freezing whole segments. Two candidates are worth carrying forward over the other five. |
+| **Cannot address** | Whether any design binds anything. Whether any is selective. Stability, expression, solubility, immunogenicity. All require experiment. |
+
+### 6. Limitations
+
+Some limitations were discovered by testing and are reported above as results: the metric failures in §4, the non-reproducible α interface, the self-association control failure, the one-topology finding. Some are inherited from the method and the compute budget and bound the claims without invalidating them. Some are fatal to a specific claim, and each is stated with the claim it rules out. Nothing below was found by a reviewer: all of it came out of the controls, which is the point.
+
+**No folded negative control:** The target-engagement gate is anchored on a composition-matched shuffled sequence, which does not fold. It therefore differs from a design in two ways at once: no epitope and no structure, so clearing it establishes that a design docks better than a random coil, not that it binds. The control needed is a folded chain with no binding surface: design 37 with the 21 motif contacts mutated out, verified to still fold. This matters more than it would elsewhere because structure predictors are trained on the PDB, which contains essentially no examples of proteins failing to interact, so their prior for any two chains is that an interface exists. The shuffled control nonetheless burying 773 Å² against IL-2Rβ is consistent with exactly that. Kills the claim that target engagement is specific.
+
+**The candidate set descends from a mis-calibrated filter:** The corrected backbone only α clearance threshold (3.02 Å, §3) excludes 12 of the 29 survivors, and everything downstream uses the 29. Distributional conclusions survive: the length-dependence finding is measured through that same gate, and of the two candidates that eventually pass every gate, one clears the stricter threshold (3.25 Å) and one does not (2.58 Å). Kills the claim that the 29 are "the α-compatible backbones" rather than 29 backbones.
+
+**The α clearance filter may have the wrong sign:** removing designs that occupy α's crystallographic volume removes the designs most likely to exclude α sterically. The filter was never justified in the direction it was applied, and the βγc equivalent: the clash that would actually matter and it was never computed at this stage at all. Kills the claim that the filter contributed selectivity rather than a size constraint.
+
+**The α gate thresholds a non-reproducible measurement against an unreplicated reference.** Requiring three of four seeds quantifies the noise documented rather than removing it, and the Neo-2/15 anchor is single-seed while the designs are four-seed. Kills any ranking of designs below the top two.
+
+**The shapes cannot be regenerated:** No random seed was set in Stage 2, so the 152 backbones cannot be reproduced from the code. The files are in this repository, so the work is verifiable but not reproducible: different claims, and the more consequential limitation here. Distributional findings would replicate on a re-run; no statement about a specific named design would.
+
+**One topology, not six candidates:** Median pairwise structural similarity of 0.892.
+
+**The two design arms are confounded:** They differ in the number of frozen positions and in the presence of a free cysteine simultaneously, so the five-fold difference in catastrophic folding failures cannot be attributed to either alone.
+
+**Target engagement is single-seed** only the α screen was replicated. So the unfavourable measurement has four seeds and the favourable one has one. This asymmetry runs in the project's favour and has no justification beyond compute budget. The pre-wetlab geometry gates inherit it.
+
+**Only the design that already scored best was cross-checked**, after the Boltz results were known, so the agreement reported there is a confirmation rather than a discrimination test. Cross-checking a design the panel rejected would have been the stronger experiment.
+
+**The complex prediction used the variant shown not to work:** Bennett et al. 2023 benchmarked in-silico filters against thousands of experimentally tested designs and found that ordinary complex prediction has little power to separate binders from non-binders, while AlphaFold2 with "initial guess" does, while seeding the model with the designed coordinates and asking whether it keeps that pose. Everything in the complex-prediction and cross-check stages uses the ordinary variant. My own shuffled control behaved exactly as that paper predicts it would, which I take as the strongest evidence that the diagnosis in §4 is correct.
+
+**The α structure used to define the motif is incomplete:** 122 of IL-2Rα's 217 residues are resolved, including a 38-residue unresolved stretch near the interface.
+
+**No energy function:** No binding energy, no shape complementarity score, no count of unsatisfied buried polar atoms computed on relaxed coordinates. PyRosetta would have supplied all three and was not used.
+
+**No structures were energy-minimised before measuring contacts:** The contact analysis finds clashes in every design and none in the references, which is an artefact of unrelaxed predicted coordinates. Diagnosed rather than removed. The buried-unsatisfied-polar counts used in 5 inherit this: they are computed on predicted side chains and shift with the hydrogen-bond cutoff.
+
+**Sequences were designed on the isolated protein:** ProteinMPNN accepts the target as context and the field standard for binders is to use it, so that positions at the edge of the interface know what they bind. Between 55 and 94 freely designed positions per design here did not.
+
+**The cross-check is partial:** Both models train on the same structural database, the α panel was never cross-checked at all, so the half of the claim that works has a second architecture behind it and the half that doesn't has none.
+
+**Per-shape designability was never measured.** Five sequences per shape at low sampling temperature are expected to be close variants: pairwise identity within a backbone group was not computed, and one was carried forward. Standard practice uses 8–48 and treats the fraction that fold correctly as the signal.
+
+### 7. Environment and provenance
+L4 and A100 GPUs. Every stage records its own environment.
+
+Backbone generation pins the RFdiffusion commit and verifies the model weights by SHA256. What that does and does not guarantee, stated plainly: the digest was recorded on first download, so it guarantees every later run gets the same bytes, and cannot attest that the first download was authentic: no independently published digest exists for that file. It was fetched over HTTPS with an explicitly flagged plaintext fallback, and the transport actually used is recorded.
+
+Complex prediction could not use the package's own dependency versions, because Boltz 2.2.1 declares a Python ceiling that Colab exceeds: a limit arising from its pinned compiled dependencies, not from Boltz itself. Dependencies were installed unversioned and Boltz with --no-deps, so "Boltz 2.2.1" does not specify this run. pip_freeze.txt does.
+
+Boltz-2's weights file embeds its training configuration as a Python object, which recent versions of PyTorch refuse to load because such files can execute arbitrary code. This was resolved by allowing only the specific configuration classes, not by disabling the check, which would have permitted arbitrary code execution from a downloaded file.
+
+The third-party notebook used for the AlphaFold cross-check was not granted Google Drive access; results were downloaded manually and extracted locally, so third-party code never ran against this project's files.
+
+### 8. References
+1. Silva, Yu, Ulge et al. De novo design of potent and selective mimics of IL-2 and IL-15. Nature 565, 186–191 (2019) — PDB 6DG5, 6DG6
+2. Wang, Rickert, Garcia. Structure of the quaternary complex of interleukin-2 with its α, β, and γc receptors. Science 310, 1159–1163 (2005) — PDB 2B5I
+3. Bennett et al. Improving de novo protein binder design with deep learning. Nat Commun 14, 2625 (2023)
+4. Watson et al. De novo design of protein structure and function with RFdiffusion. Nature 620, 1089–1100 (2023)
+5. Dauparas et al. Robust deep learning-based protein sequence design using ProteinMPNN. Science 378, 49–56 (2022)
+6. Lin et al. Evolutionary-scale prediction of atomic-level protein structure with a language model. Science 379, 1123–1130 (2023) — ESMFold, ESM-2
+7. Wohlwend et al. Boltz-1 / Boltz-2. MIT (2024, 2025)
+8. Mirdita et al. ColabFold: making protein folding accessible to all. Nat Methods 19, 679–682 (2022)
